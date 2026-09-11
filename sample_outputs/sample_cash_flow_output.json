@@ -1,0 +1,60 @@
+{
+  "document_name": "cashflow_northwind_fy2025.pdf",
+  "document_type": "cash_flow_statement",
+  "processing_status": "completed",
+  "file_validation": {
+    "is_valid": true,
+    "file_type": "pdf",
+    "page_count": 1,
+    "errors": []
+  },
+  "extracted_data": {
+    "company_name": { "value": "Northwind Manufacturing Ltd", "source_text": "Northwind Manufacturing Ltd", "page_number": 1, "confidence": 0.95 },
+    "report_date": { "value": "2025-03-31", "source_text": "Year ended 31 March 2025", "page_number": 1, "confidence": 0.92 },
+    "currency": { "value": "INR", "source_text": "(All amounts in INR Lakhs)", "page_number": 1, "confidence": 0.9 },
+    "periods": [
+      {
+        "period_label": "FY2025",
+        "line_items": {
+          "operating_cash_flow": { "value": 15800.0, "source_text": "Net Cash from Operating Activities 15,800.00", "page_number": 1, "confidence": 0.93 },
+          "investing_cash_flow": { "value": -6200.0, "source_text": "Net Cash used in Investing Activities (6,200.00)", "page_number": 1, "confidence": 0.9 },
+          "financing_cash_flow": { "value": -3100.0, "source_text": "Net Cash used in Financing Activities (3,100.00)", "page_number": 1, "confidence": 0.9 },
+          "net_change_in_cash": { "value": 6500.0, "source_text": "Net Increase in Cash 6,500.00", "page_number": 1, "confidence": 0.93 },
+          "opening_cash": { "value": 8200.0, "source_text": "Cash at Beginning of Year 8,200.00", "page_number": 1, "confidence": 0.92 },
+          "closing_cash": { "value": 14700.0, "source_text": "Cash at End of Year 14,700.00", "page_number": 1, "confidence": 0.93 }
+        }
+      }
+    ],
+    "additional_fields": {}
+  },
+  "validation": {
+    "checks": [
+      {
+        "name": "operating_investing_financing_vs_net_change",
+        "formula": "operating_cash_flow + investing_cash_flow + financing_cash_flow ≈ net_change_in_cash",
+        "operands": { "operating_cash_flow": 15800.0, "investing_cash_flow": -6200.0, "financing_cash_flow": -3100.0 },
+        "calculated_value": 6500.0,
+        "reported_value": 6500.0,
+        "variance": 0.0,
+        "status": "PASS",
+        "period_label": "FY2025"
+      },
+      {
+        "name": "opening_cash_plus_net_change_vs_closing_cash",
+        "formula": "opening_cash + net_change_in_cash ≈ closing_cash",
+        "operands": { "opening_cash": 8200.0, "net_change_in_cash": 6500.0 },
+        "calculated_value": 14700.0,
+        "reported_value": 14700.0,
+        "variance": 0.0,
+        "status": "PASS",
+        "period_label": "FY2025"
+      }
+    ],
+    "overall_status": "PASS"
+  },
+  "processing_metadata": {
+    "ocr_used": false,
+    "processed_at": "2026-06-14T09:27:03.556Z",
+    "processing_time_ms": 1690.42
+  }
+}

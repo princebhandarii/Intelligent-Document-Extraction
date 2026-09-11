@@ -1,0 +1,71 @@
+{
+  "document_name": "pl_northwind_fy2025.pdf",
+  "document_type": "profit_and_loss",
+  "processing_status": "completed",
+  "file_validation": {
+    "is_valid": true,
+    "file_type": "pdf",
+    "page_count": 1,
+    "errors": []
+  },
+  "extracted_data": {
+    "company_name": { "value": "Northwind Manufacturing Ltd", "source_text": "Northwind Manufacturing Ltd", "page_number": 1, "confidence": 0.96 },
+    "report_date": { "value": "2025-03-31", "source_text": "Year ended 31 March 2025", "page_number": 1, "confidence": 0.93 },
+    "currency": { "value": "INR", "source_text": "(All amounts in INR Lakhs)", "page_number": 1, "confidence": 0.9 },
+    "periods": [
+      {
+        "period_label": "FY2025",
+        "line_items": {
+          "revenue": { "value": 62000.0, "source_text": "Revenue from Operations 62,000.00", "page_number": 1, "confidence": 0.95 },
+          "cost_of_sales": { "value": 38000.0, "source_text": "Cost of Goods Sold 38,000.00", "page_number": 1, "confidence": 0.93 },
+          "gross_profit": { "value": 24000.0, "source_text": "Gross Profit 24,000.00", "page_number": 1, "confidence": 0.94 },
+          "operating_expenses": { "value": 9500.0, "source_text": "Operating Expenses 9,500.00", "page_number": 1, "confidence": 0.92 },
+          "operating_profit": { "value": 14500.0, "source_text": "Operating Profit 14,500.00", "page_number": 1, "confidence": 0.93 },
+          "tax": { "value": 3625.0, "source_text": "Tax Expense 3,625.00", "page_number": 1, "confidence": 0.9 },
+          "net_profit": { "value": 10875.0, "source_text": "Net Profit 10,875.00", "page_number": 1, "confidence": 0.94 }
+        }
+      }
+    ],
+    "additional_fields": {}
+  },
+  "validation": {
+    "checks": [
+      {
+        "name": "revenue_minus_cogs_vs_gross_profit",
+        "formula": "revenue - cost_of_sales ≈ gross_profit",
+        "operands": { "revenue": 62000.0, "cost_of_sales": 38000.0 },
+        "calculated_value": 24000.0,
+        "reported_value": 24000.0,
+        "variance": 0.0,
+        "status": "PASS",
+        "period_label": "FY2025"
+      },
+      {
+        "name": "gross_profit_minus_opex_vs_operating_profit",
+        "formula": "gross_profit - operating_expenses ≈ operating_profit",
+        "operands": { "gross_profit": 24000.0, "operating_expenses": 9500.0 },
+        "calculated_value": 14500.0,
+        "reported_value": 14500.0,
+        "variance": 0.0,
+        "status": "PASS",
+        "period_label": "FY2025"
+      },
+      {
+        "name": "operating_profit_minus_tax_vs_net_profit",
+        "formula": "operating_profit - tax ≈ net_profit",
+        "operands": { "operating_profit": 14500.0, "tax": 3625.0 },
+        "calculated_value": 10875.0,
+        "reported_value": 10875.0,
+        "variance": 0.0,
+        "status": "PASS",
+        "period_label": "FY2025"
+      }
+    ],
+    "overall_status": "PASS"
+  },
+  "processing_metadata": {
+    "ocr_used": false,
+    "processed_at": "2026-06-14T09:24:47.881Z",
+    "processing_time_ms": 1875.09
+  }
+}

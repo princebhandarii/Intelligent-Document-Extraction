@@ -1,0 +1,102 @@
+{
+  "document_name": "invoice_acme_0042.pdf",
+  "document_type": "invoice",
+  "processing_status": "completed",
+  "file_validation": {
+    "is_valid": true,
+    "file_type": "pdf",
+    "page_count": 1,
+    "errors": []
+  },
+  "extracted_data": {
+    "invoice_number": { "value": "INV-0042", "source_text": "Invoice No: INV-0042", "page_number": 1, "confidence": 0.97 },
+    "invoice_date": { "value": "2026-06-14", "source_text": "Date: 14 Jun 2026", "page_number": 1, "confidence": 0.95 },
+    "vendor_name": { "value": "Acme Supplies Pvt Ltd", "source_text": "Acme Supplies Pvt Ltd", "page_number": 1, "confidence": 0.96 },
+    "customer_name": { "value": "Bright Retail Co.", "source_text": "Bill To: Bright Retail Co.", "page_number": 1, "confidence": 0.94 },
+    "currency": { "value": "INR", "source_text": "Amount in INR", "page_number": 1, "confidence": 0.9 },
+    "subtotal": { "value": 18500.0, "source_text": "Subtotal: 18,500.00", "page_number": 1, "confidence": 0.96 },
+    "tax_amount": { "value": 3330.0, "source_text": "GST (18%): 3,330.00", "page_number": 1, "confidence": 0.95 },
+    "discount": { "value": 0.0, "source_text": null, "page_number": null, "confidence": null },
+    "total_amount": { "value": 21830.0, "source_text": "Total Due: 21,830.00", "page_number": 1, "confidence": 0.97 },
+    "cash_paid": { "value": null, "source_text": null, "page_number": null, "confidence": null },
+    "change": { "value": null, "source_text": null, "page_number": null, "confidence": null },
+    "line_items": [
+      {
+        "description": { "value": "Office Chairs (Model X200)", "source_text": "Office Chairs Model X200", "page_number": 1, "confidence": 0.93 },
+        "quantity": { "value": 10, "source_text": "Qty: 10", "page_number": 1, "confidence": 0.96 },
+        "unit_price": { "value": 1200.0, "source_text": "Rate: 1,200.00", "page_number": 1, "confidence": 0.95 },
+        "amount": { "value": 12000.0, "source_text": "Amount: 12,000.00", "page_number": 1, "confidence": 0.96 }
+      },
+      {
+        "description": { "value": "Standing Desks", "source_text": "Standing Desks", "page_number": 1, "confidence": 0.92 },
+        "quantity": { "value": 5, "source_text": "Qty: 5", "page_number": 1, "confidence": 0.95 },
+        "unit_price": { "value": 1300.0, "source_text": "Rate: 1,300.00", "page_number": 1, "confidence": 0.94 },
+        "amount": { "value": 6500.0, "source_text": "Amount: 6,500.00", "page_number": 1, "confidence": 0.95 }
+      }
+    ],
+    "additional_fields": {
+      "payment_terms": "Net 30",
+      "po_number": "PO-77213"
+    }
+  },
+  "validation": {
+    "checks": [
+      {
+        "name": "line_item_1_total",
+        "formula": "quantity * unit_price ≈ amount",
+        "operands": { "quantity": 10, "unit_price": 1200.0 },
+        "calculated_value": 12000.0,
+        "reported_value": 12000.0,
+        "variance": 0.0,
+        "status": "PASS",
+        "period_label": null
+      },
+      {
+        "name": "line_item_2_total",
+        "formula": "quantity * unit_price ≈ amount",
+        "operands": { "quantity": 5, "unit_price": 1300.0 },
+        "calculated_value": 6500.0,
+        "reported_value": 6500.0,
+        "variance": 0.0,
+        "status": "PASS",
+        "period_label": null
+      },
+      {
+        "name": "line_items_sum_vs_subtotal",
+        "formula": "sum(line_item.amount) ≈ subtotal",
+        "operands": { "line_item_sum": 18500.0 },
+        "calculated_value": 18500.0,
+        "reported_value": 18500.0,
+        "variance": 0.0,
+        "status": "PASS",
+        "period_label": null
+      },
+      {
+        "name": "subtotal_tax_discount_vs_total",
+        "formula": "subtotal + tax_amount - discount ≈ total_amount",
+        "operands": { "subtotal": 18500.0, "tax_amount": 3330.0, "discount": 0.0 },
+        "calculated_value": 21830.0,
+        "reported_value": 21830.0,
+        "variance": 0.0,
+        "status": "PASS",
+        "period_label": null
+      },
+      {
+        "name": "cash_paid_vs_change",
+        "formula": "cash_paid - total_amount ≈ change",
+        "operands": { "cash_paid": null, "total_amount": 21830.0 },
+        "calculated_value": null,
+        "reported_value": null,
+        "variance": null,
+        "status": "NOT_APPLICABLE",
+        "period_label": null
+      }
+    ],
+    "overall_status": "PASS"
+  },
+  "processing_metadata": {
+    "ocr_used": false,
+    "processed_at": "2026-06-14T09:12:31.402Z",
+    "processing_time_ms": 2140.55
+  }
+}

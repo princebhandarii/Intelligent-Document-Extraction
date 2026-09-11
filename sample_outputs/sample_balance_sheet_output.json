@@ -1,0 +1,71 @@
+{
+  "document_name": "balance_sheet_northwind_fy2025.pdf",
+  "document_type": "balance_sheet",
+  "processing_status": "completed",
+  "file_validation": {
+    "is_valid": true,
+    "file_type": "pdf",
+    "page_count": 2,
+    "errors": []
+  },
+  "extracted_data": {
+    "company_name": { "value": "Northwind Manufacturing Ltd", "source_text": "Northwind Manufacturing Ltd", "page_number": 1, "confidence": 0.96 },
+    "report_date": { "value": "2025-03-31", "source_text": "As at 31 March 2025", "page_number": 1, "confidence": 0.94 },
+    "currency": { "value": "INR", "source_text": "(All amounts in INR Lakhs)", "page_number": 1, "confidence": 0.9 },
+    "periods": [
+      {
+        "period_label": "FY2025",
+        "line_items": {
+          "total_assets": { "value": 48200.0, "source_text": "Total Assets 48,200.00", "page_number": 1, "confidence": 0.95 },
+          "total_liabilities": { "value": 21100.0, "source_text": "Total Liabilities 21,100.00", "page_number": 1, "confidence": 0.94 },
+          "total_equity": { "value": 27100.0, "source_text": "Total Equity 27,100.00", "page_number": 1, "confidence": 0.94 },
+          "current_assets": { "value": 19500.0, "source_text": "Current Assets 19,500.00", "page_number": 1, "confidence": 0.92 },
+          "non_current_assets": { "value": 28700.0, "source_text": "Non-Current Assets 28,700.00", "page_number": 1, "confidence": 0.91 },
+          "current_liabilities": { "value": 9800.0, "source_text": "Current Liabilities 9,800.00", "page_number": 1, "confidence": 0.9 },
+          "non_current_liabilities": { "value": 11300.0, "source_text": "Non-Current Liabilities 11,300.00", "page_number": 1, "confidence": 0.9 }
+        }
+      },
+      {
+        "period_label": "FY2024",
+        "line_items": {
+          "total_assets": { "value": 43900.0, "source_text": "Total Assets 43,900.00", "page_number": 2, "confidence": 0.93 },
+          "total_liabilities": { "value": 19800.0, "source_text": "Total Liabilities 19,800.00", "page_number": 2, "confidence": 0.92 },
+          "total_equity": { "value": 24100.0, "source_text": "Total Equity 24,100.00", "page_number": 2, "confidence": 0.92 }
+        }
+      }
+    ],
+    "additional_fields": {
+      "auditor": "Sharma & Associates"
+    }
+  },
+  "validation": {
+    "checks": [
+      {
+        "name": "liabilities_plus_equity_vs_assets",
+        "formula": "total_liabilities + total_equity ≈ total_assets",
+        "operands": { "total_liabilities": 21100.0, "total_equity": 27100.0 },
+        "calculated_value": 48200.0,
+        "reported_value": 48200.0,
+        "variance": 0.0,
+        "status": "PASS",
+        "period_label": "FY2025"
+      },
+      {
+        "name": "liabilities_plus_equity_vs_assets",
+        "formula": "total_liabilities + total_equity ≈ total_assets",
+        "operands": { "total_liabilities": 19800.0, "total_equity": 24100.0 },
+        "calculated_value": 43900.0,
+        "reported_value": 43900.0,
+        "variance": 0.0,
+        "status": "PASS",
+        "period_label": "FY2024"
+      }
+    ],
+    "overall_status": "PASS"
+  },
+  "processing_metadata": {
+    "ocr_used": true,
+    "processed_at": "2026-06-14T09:20:11.118Z",
+    "processing_time_ms": 3980.21
+  }
+}

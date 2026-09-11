@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document Intelligence Platform</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Document Intelligence Platform</h1>
+    <span class="subtitle">Invoice &middot; Balance Sheet &middot; P&amp;L &middot; Cash Flow</span>
+  </header>
+
+  <main>
+    <section>
+      <h2>Process a Document</h2>
+      <div class="upload-panel">
+        <div>
+          <label for="document-type">Document Type</label>
+          <select id="document-type">
+            <option value="invoice">Invoice</option>
+            <option value="balance_sheet">Balance Sheet</option>
+            <option value="profit_and_loss">Profit &amp; Loss</option>
+            <option value="cash_flow_statement">Cash Flow Statement</option>
+          </select>
+        </div>
+        <div>
+          <label for="document-file">File (PDF, JPG, PNG)</label>
+          <input type="file" id="document-file" accept=".pdf,.jpg,.jpeg,.png" />
+        </div>
+        <div>
+          <button id="process-button">Process Document</button>
+        </div>
+        <div class="status-line" id="upload-status"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Processed Documents</h2>
+      <div id="dashboard-container">
+        <div class="empty-state">Loading documents...</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/upload.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
