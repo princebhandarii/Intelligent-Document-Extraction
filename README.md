@@ -36,6 +36,10 @@ backend (FastAPI + Uvicorn, Docker, Render)
      Neon (managed Postgres, serverless)
 ```
 
+<img width="1088" height="560" alt="Architecture" src="https://github.com/user-attachments/assets/1b72651c-d820-4467-a83f-a72986a365cb" />
+
+
+
 The backend is layered as `api/routes` → `services` → `repositories` → `models`, with
 Pydantic `schemas` defining every request/response contract. See `docs/architecture.md`
 for the full diagram.
