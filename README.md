@@ -238,3 +238,30 @@ independently of the backend's own hosting lifecycle.
   currently implemented.
 
 
+
+## 11. AI Tools Used
+
+An AI coding assistant was used throughout the development of this project. Specific
+areas where it was used:
+
+- **Architecture & project structure**: designing the layered backend structure
+  (api/routes → services → repositories → models), and the overall
+  frontend/backend/database separation.
+- **Backend implementation**: writing the FastAPI routes, Pydantic schemas, OCR
+  service (PyMuPDF + Tesseract), LLM extraction service and prompt design, financial
+  validation logic, and the SQLAlchemy repository layer.
+- **Bug fixing & debugging**: diagnosing and fixing issues found during testing,
+  including a numeric-parsing bug (comma vs. dot decimal separators), a line-item
+  extraction gap, a missing shipping-charge field in the total-validation formula,
+  and a quantity-misread reconciliation step.
+- **Frontend implementation**: writing the HTML/CSS/JavaScript for the upload form,
+  dashboard, and result-detail view, including the logic to render extracted fields,
+  line items, and validation results from the API response.
+- **Deployment troubleshooting**: resolving a missing Postgres driver
+  (`psycopg2-binary`) in the Docker build, a duplicated API path in the frontend
+  configuration, and CORS configuration between the Render backend and Vercel
+  frontend.
+- **Documentation**: drafting this README, the architecture diagram description, and
+  the solution presentation.
+
+
