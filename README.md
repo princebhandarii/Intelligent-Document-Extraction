@@ -233,13 +233,4 @@ independently of the backend's own hosting lifecycle.
 - Broaden currency/locale handling beyond the comma/dot decimal normalization
   currently implemented.
 
-## 11. AI Tools Used
 
-This codebase was built with the assistance of Claude (Anthropic), used throughout
-for: designing the backend architecture and repository structure, writing the
-FastAPI routes/services/models, the OCR and LLM extraction pipeline, the financial
-validation logic, the frontend HTML/CSS/JS, debugging deployment issues (Render/Vercel
-configuration, CORS, environment variables, dependency errors), and iterating on
-extraction accuracy based on real test documents. All generated code was reviewed,
-tested against real sample documents, and the automated test suite (`pytest`) was run
-to confirm file-validation, financial-calculation, and API-flow tests pass.
