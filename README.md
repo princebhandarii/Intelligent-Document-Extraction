@@ -4,16 +4,37 @@ Extracts, validates, and stores structured data from four financial document typ
 Invoice, Balance Sheet, Profit & Loss, and Cash Flow Statement — from native PDFs,
 scanned PDFs, or JPG/PNG images.
 
+**Live Frontend:** https://intelligent-document-extraction.vercel.app
+**Live Backend API:** https://intelligent-document-extraction-ub14.onrender.com
+**Swagger / OpenAPI Docs:** https://intelligent-document-extraction-ub14.onrender.com/docs
+**GitHub Repository:** https://github.com/princebhandarii/Intelligent-Document-Extraction
+
+> Note: the backend runs on Render's free tier, which spins down after inactivity.
+> The first request after idle time can take 30–60 seconds to respond — this is a
+> known platform limitation, not an application error. See Known Limitations below.
+
 ## 1. Solution Overview & Architecture
 
-See `docs/architecture.md` for the full diagram and layering explanation. In short:
-
 ```
-frontend (static HTML/CSS/JS, Vercel) --fetch()--> backend (FastAPI, Render) --> SQLite
+frontend (static HTML/CSS/JS, Vercel)
+   │  fetch()
+   ▼
+backend (FastAPI + Uvicorn, Docker, Render)
+   │
+   ├── file validation (type, size, page count, integrity)
+   ├── OCR / text extraction (PyMuPDF for native PDFs, Tesseract for scans & images)
+   ├── LLM extraction (Groq, OpenAI-compatible /chat/completions endpoint)
+   ├── quantity reconciliation (derives quantity from amount ÷ unit_price when OCR misreads it)
+   ├── financial validation (formulas computed in code, never by the LLM)
+   └── persistence (SQLAlchemy → Postgres)
+           │
+           ▼
+     Neon (managed Postgres, serverless)
 ```
 
 The backend is layered as `api/routes` → `services` → `repositories` → `models`, with
-Pydantic `schemas` defining every request/response contract.
+Pydantic `schemas` defining every request/response contract. See `docs/architecture.md`
+for the full diagram.
 
 ## 2. Tech Stack & Why
 
@@ -21,11 +42,13 @@ Pydantic `schemas` defining every request/response contract.
 |---|---|---|
 | API framework | FastAPI + Uvicorn | async-ready, automatic OpenAPI/Swagger docs, strong Pydantic v2 integration |
 | Validation/schemas | Pydantic v2 | single source of truth for request/response shapes |
-| PDF text | PyMuPDF (fitz) | fast native text extraction, also used to rasterize scanned pages |
-| OCR | pytesseract (Tesseract) | free, self-hostable, no external API dependency for OCR itself |
-| Structured extraction | any OpenAI-compatible LLM API | swappable via env vars, so any provider/key can be plugged in |
-| Database | SQLite via SQLAlchemy, repository pattern | zero-ops for a case study; repository layer makes swapping to Postgres a one-line change |
-| Frontend | Plain HTML/CSS/vanilla JS | matches the no-build-step requirement, deploys as a static site on Vercel |
+| PDF text | PyMuPDF (fitz) | fast native text extraction; used first, before falling back to OCR |
+| OCR | pytesseract (Tesseract) | free, self-hostable, no external API key or rate limits |
+| Structured extraction | Groq (Llama-family model via OpenAI-compatible API) | free tier with no card required, fast inference, drop-in OpenAI-style request format |
+| Database | PostgreSQL (Neon, serverless) via SQLAlchemy, repository pattern | free tier, persists independently of the backend host, no cold-start data loss |
+| Backend hosting | Render (Docker) | Dockerfile installs Tesseract as a system package; free tier is Docker-native |
+| Frontend hosting | Vercel | zero-config static hosting, instant global CDN, no cold starts |
+| Frontend | Plain HTML/CSS/vanilla JS | matches the no-build-step requirement, deploys as a static site |
 | Testing | pytest | file validation, financial math, and a full API round trip are covered |
 
 ## 3. Local Setup
@@ -52,11 +75,12 @@ brew install tesseract
 # and set TESSERACT_CMD in .env to the full path of tesseract.exe
 ```
 
-Copy the environment file and fill in your LLM key:
+Copy the environment file and fill in your own values:
 
 ```bash
 cp ../.env.example .env
-# edit .env and set LLM_API_KEY
+# edit .env: set DATABASE_URL (a Postgres connection string, e.g. from neon.tech)
+# and LLM_API_KEY (a free key from console.groq.com)
 ```
 
 Run the server:
@@ -75,33 +99,30 @@ pytest
 
 ### Frontend
 
-No build step — just serve the static files. Two easy options:
+No build step — just serve the static files:
 
 ```bash
 cd frontend
-python -m http.server 5500
+python3 -m http.server 5500
 # open http://localhost:5500
 ```
 
-or use the VS Code "Live Server" extension pointed at `frontend/index.html`.
-
-By default `frontend/js/config.js` points at `http://localhost:8000` when running on
-`localhost`, and at a placeholder production URL otherwise — update that placeholder
-once the backend is deployed (see Deployment section).
+`frontend/js/config.js` points at `http://localhost:8000` when running on `localhost`,
+and at the deployed Render URL otherwise.
 
 ## 4. .env.example Explained
 
 | Variable | Purpose |
 |---|---|
 | `ENVIRONMENT` | `development` or `production`, informational |
-| `DATABASE_URL` | SQLAlchemy connection string, defaults to a local SQLite file |
-| `CORS_ALLOWED_ORIGIN` | The exact origin allowed to call the API (your frontend's URL) |
+| `DATABASE_URL` | SQLAlchemy Postgres connection string (e.g. from Neon) |
+| `CORS_ALLOWED_ORIGIN` | The exact origin allowed to call the API (the deployed frontend's URL) |
 | `MAX_UPLOAD_PAGES` | Hard cap on pages per document (spec requires rejecting >3) |
 | `MAX_UPLOAD_SIZE_MB` | Hard cap on upload size |
-| `LLM_PROVIDER` | Label for which provider you're using (informational, base URL drives behavior) |
-| `LLM_BASE_URL` | Base URL of an OpenAI-compatible `/chat/completions` endpoint |
-| `LLM_API_KEY` | Your API key for that provider — required for extraction to work |
-| `LLM_MODEL` | Model name to request |
+| `LLM_PROVIDER` | Label for which provider is in use (informational) |
+| `LLM_BASE_URL` | Base URL of the OpenAI-compatible `/chat/completions` endpoint (Groq) |
+| `LLM_API_KEY` | API key for the LLM provider — required for extraction to work |
+| `LLM_MODEL` | Model name to request (e.g. `openai/gpt-oss-120b` on Groq) |
 | `TESSERACT_CMD` | Path to the tesseract binary if it's not on PATH |
 | `FINANCIAL_TOLERANCE_PERCENT` | Allowed variance percentage before a validation check is marked FAIL |
 
@@ -110,7 +131,7 @@ once the backend is deployed (see Deployment section).
 **Process a document**
 
 ```bash
-curl -X POST http://localhost:8000/api/v1/documents/process \
+curl -X POST https://intelligent-document-extraction-ub14.onrender.com/api/v1/documents/process \
   -F "file=@invoice.pdf" \
   -F "document_type=invoice"
 ```
@@ -118,32 +139,39 @@ curl -X POST http://localhost:8000/api/v1/documents/process \
 **Get a processed document by name**
 
 ```bash
-curl http://localhost:8000/api/v1/documents/invoice.pdf
+curl https://intelligent-document-extraction-ub14.onrender.com/api/v1/documents/invoice.pdf
 ```
 
 **List all processed documents**
 
 ```bash
-curl http://localhost:8000/api/v1/documents
+curl https://intelligent-document-extraction-ub14.onrender.com/api/v1/documents
 ```
 
 **Health check**
 
 ```bash
-curl http://localhost:8000/api/v1/health
+curl https://intelligent-document-extraction-ub14.onrender.com/api/v1/health
 ```
 
 Full request/response schemas are always up to date at `/docs`.
 
 ## 6. OCR and LLM Services Used
 
-- **OCR**: Tesseract via `pytesseract`, only invoked when a PDF has no extractable
-  native text layer (i.e. it's a scan) or the upload is a JPG/PNG. Native PDF text is
-  read directly with PyMuPDF, which is faster and more accurate than OCR when available.
-- **LLM extraction**: a single call to any OpenAI-compatible `/chat/completions`
-  endpoint, with a strict per-document-type JSON schema in the prompt. The model is
+- **OCR**: Tesseract via `pytesseract`, invoked when a PDF has no extractable native
+  text layer (i.e. it's a scan) or the upload is a JPG/PNG. Native PDF text is read
+  directly with PyMuPDF first, which is faster and more accurate than OCR when available.
+- **LLM extraction**: a single call to Groq's OpenAI-compatible `/chat/completions`
+  endpoint (free tier, no card required), using `response_format: json_object` to
+  force valid JSON and a strict per-document-type schema in the prompt. The model is
   instructed to return `null` for anything not actually present in the text rather
-  than inferring a value.
+  than inferring a value, and to preserve the document's original numeric formatting
+  (comma vs. dot decimal separators) alongside a normalized numeric value.
+- **Quantity reconciliation**: a small post-processing step (`reconciliation_service.py`)
+  cross-checks each line item's `quantity × unit_price ≈ amount`. If the OCR/LLM
+  reading of quantity doesn't reconcile but a clean whole-number quantity can be
+  derived from the already-correct `amount` and `unit_price`, it corrects the
+  quantity — since those two values are already grounded in the same row.
 
 ## 7. Financial Validation Rules & Tolerance
 
@@ -153,51 +181,61 @@ required input is missing, rather than guessing. Default tolerance is **1%**,
 configurable via `FINANCIAL_TOLERANCE_PERCENT`.
 
 - **Invoice**: `quantity × unit_price ≈ line amount` per line item; `sum(line amounts) ≈ subtotal`;
-  `subtotal + tax − discount ≈ total`; `cash_paid − total ≈ change`.
+  `subtotal + tax + shipping − discount ≈ total`; `cash_paid − total ≈ change`.
 - **Balance Sheet**: `total_liabilities + total_equity ≈ total_assets`, per period.
 - **Profit & Loss**: `revenue − cost_of_sales ≈ gross_profit`; `gross_profit − operating_expenses ≈ operating_profit`;
   `operating_profit − tax ≈ net_profit`, per period.
 - **Cash Flow**: `operating + investing + financing ≈ net_change_in_cash`; `opening_cash + net_change_in_cash ≈ closing_cash`, per period.
 
-Bracketed/parenthesized amounts (e.g. `(6,200.00)`) are parsed as negative numbers
-throughout.
+Bracketed/parenthesized amounts (e.g. `(6,200.00)`) are parsed as negative numbers.
+Both comma-as-decimal (European, e.g. `138,90`) and comma-as-thousands (e.g. `1,234.56`)
+number formats are detected and normalized before any calculation.
 
 ## 8. Database Approach
 
-SQLite via SQLAlchemy Core/ORM, accessed exclusively through
-`repositories/document_repository.py` (repository pattern). Each processing run is
-stored as a new row keyed by `document_name`; `GET /documents/{name}` returns the most
-recent one. This keeps a full history while the "latest result" semantics required by
-the spec still work. Swapping to Postgres is just a `DATABASE_URL` change.
+PostgreSQL (hosted on Neon, a free serverless Postgres provider), accessed exclusively
+through `repositories/document_repository.py` (repository pattern) via SQLAlchemy.
+Each processing run is stored as a new row keyed by `document_name`;
+`GET /documents/{name}` returns the most recent one. This keeps a full history while
+the "latest result" semantics required by the spec still work. Using a managed
+Postgres instance (rather than local SQLite) means processed data persists
+independently of the backend's own hosting lifecycle.
 
 ## 9. Known Limitations
 
 - Processing is synchronous — a large/slow OCR+LLM call blocks the request until done.
-- SQLite is single-file and not suited to concurrent write-heavy production traffic.
-- The LLM extraction is a single pass with no self-consistency or human-in-the-loop review step.
-- No authentication/authorization on the API — anyone with the URL can upload and read documents.
+- Backend is on Render's free tier, which spins down after inactivity; the first
+  request after idle time can take 30–60 seconds.
+- OCR output can vary slightly between runs on the same image, since Tesseract's
+  reading is not perfectly deterministic on lower-quality scans.
+- Quantity reconciliation only handles the simple `quantity × unit_price ≈ amount`
+  case — it will not fix every possible OCR misread.
+- A single free LLM provider (Groq) is used, with no automatic failover if it's
+  unavailable or rate-limited.
+- No authentication/authorization on the API — anyone with the URL can upload and
+  read documents.
 - No malware/antivirus scanning on uploaded files.
 
 ## 10. What Would Change for Production
 
-- Move processing to a background job queue (e.g. Celery/RQ) with a polling or webhook
-  status endpoint instead of a synchronous request.
-- Move the database to managed Postgres with proper migrations (Alembic).
+- Move processing to a background job queue (e.g. Celery/RQ) with a polling or
+  webhook status endpoint instead of a synchronous request.
+- Move to a paid hosting tier (or an always-on host) to eliminate cold starts.
+- Add a second LLM provider as a fallback, and/or a self-consistency pass for
+  higher-stakes extractions.
 - Add authentication (API keys or OAuth), per-tenant isolation, and rate limiting.
-- Add a second LLM pass or rules engine to cross-check extraction confidence before
-  trusting a value in downstream financial reporting.
 - Add virus scanning and stricter file-content sniffing beyond extension checks.
 - Add structured, centralized log aggregation and alerting.
+- Broaden currency/locale handling beyond the comma/dot decimal normalization
+  currently implemented.
 
 ## 11. AI Tools Used
 
-This codebase was built with the assistance of an AI coding assistant (Claude), which
-generated the initial implementation of the backend services, API routes, frontend, and
-tests based on a detailed specification. All code was reviewed and the automated test
-suite (`pytest`) was run to confirm the file-validation, financial-calculation, and
-API-flow tests pass before delivery.
-
-## Deployed URLs
-
-- Backend (Render): `https://<your-backend-service>.onrender.com` *(fill in after deploying)*
-- Frontend (Vercel): `https://<your-frontend-project>.vercel.app` *(fill in after deploying)*
+This codebase was built with the assistance of Claude (Anthropic), used throughout
+for: designing the backend architecture and repository structure, writing the
+FastAPI routes/services/models, the OCR and LLM extraction pipeline, the financial
+validation logic, the frontend HTML/CSS/JS, debugging deployment issues (Render/Vercel
+configuration, CORS, environment variables, dependency errors), and iterating on
+extraction accuracy based on real test documents. All generated code was reviewed,
+tested against real sample documents, and the automated test suite (`pytest`) was run
+to confirm file-validation, financial-calculation, and API-flow tests pass.
