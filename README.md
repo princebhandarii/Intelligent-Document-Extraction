@@ -4,10 +4,14 @@ Extracts, validates, and stores structured data from four financial document typ
 Invoice, Balance Sheet, Profit & Loss, and Cash Flow Statement — from native PDFs,
 scanned PDFs, or JPG/PNG images.
 
-**Live Frontend:** https://intelligent-document-extraction.vercel.app
+**Live Frontend:** https://intelligent-document-extraction.vercel.app 
+<hr>
 **Live Backend API:** https://intelligent-document-extraction-ub14.onrender.com
+<hr>
 **Swagger / OpenAPI Docs:** https://intelligent-document-extraction-ub14.onrender.com/docs
+<hr>
 **GitHub Repository:** https://github.com/princebhandarii/Intelligent-Document-Extraction
+<hr>
 
 > Note: the backend runs on Render's free tier, which spins down after inactivity.
 > The first request after idle time can take 30–60 seconds to respond — this is a
