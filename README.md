@@ -7,6 +7,8 @@ scanned PDFs, or JPG/PNG images.
 **Live Frontend:** https://intelligent-document-extraction.vercel.app 
 <hr>
 **Live Backend API:** https://intelligent-document-extraction-ub14.onrender.com
+*To Check End point*
+https://intelligent-document-extraction-ub14.onrender.com/api/v1/health
 <hr>
 **Swagger / OpenAPI Docs:** https://intelligent-document-extraction-ub14.onrender.com/docs
 <hr>
